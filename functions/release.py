@@ -1,5 +1,9 @@
+import os
+
 from http import HTTPStatus
 from json import loads
+
+from github3.github import GitHub
 
 
 def handler(event, context):
@@ -13,6 +17,10 @@ def handler(event, context):
         return {
             'statusCode': HTTPStatus.NO_CONTENT
         }
+
+    github = GitHub(token=os.getenv('GITHUB_TOKEN'))
+    print(github)
+
     return {
         'statusCode': HTTPStatus.OK
     }

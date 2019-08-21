@@ -5,6 +5,7 @@ jobs:
     steps:
       - checkout
       - run: pip install pytest pytest-cov pytest-flake8
+      - run: pip install -r functions/requirements.txt
       - run: python -m pytest
 version: 2.0
 workflows:

@@ -1,22 +1,28 @@
+import os
 import pytest
 
 from json import load
-from os import path
+from unittest.mock import call, patch
 
 from functions.release import handler
 
 
-BASE_DIR = path.dirname(path.dirname(path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 @pytest.fixture
 def event():
     """Represents an Amazon API Gateway event"""
-    with open(path.join(BASE_DIR, '..', 'event.json')) as f:
+    with open(os.path.join(BASE_DIR, '..', 'event.json')) as f:
         return load(f)
 
 
-def test_handler(event):
+@patch('functions.release.GitHub', autospec=True)
+@patch.dict('os.environ', {'GITHUB_TOKEN': '4cafddbf'})
+def test_handler(GitHub, event):
     context = None
     response = handler(event, context)
     assert response['statusCode'] == 200
+
+    assert GitHub.call_count == 1
+    assert GitHub.call_args == call(token='4cafddbf')
