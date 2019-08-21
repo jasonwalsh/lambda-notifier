@@ -11,6 +11,7 @@ def handler(event, context):
     # https://developer.github.com/v3/activity/events/types/#releaseevent
     body = loads(event['body'])
     action = body['action']
+
     # Available action types: published, unpublished, created, edited, deleted,
     # or prereleased
     if action != 'published':
@@ -18,8 +19,11 @@ def handler(event, context):
             'statusCode': HTTPStatus.NO_CONTENT
         }
 
-    github = GitHub(token=os.getenv('GITHUB_TOKEN'))
-    print(github)
+    client = GitHub(token=os.getenv('GITHUB_TOKEN'))
+
+    # For example Codertocat/Hello-World
+    owner, repo = body['release']['repository']['full_name'].split('/')
+    client.repository(owner, repo)
 
     return {
         'statusCode': HTTPStatus.OK

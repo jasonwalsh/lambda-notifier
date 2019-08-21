@@ -19,10 +19,11 @@ def event():
 
 @patch('functions.release.GitHub', autospec=True)
 @patch.dict('os.environ', {'GITHUB_TOKEN': '4cafddbf'})
-def test_handler(GitHub, event):
+def test_handler(client, event):
     context = None
     response = handler(event, context)
+
     assert response['statusCode'] == 200
 
-    assert GitHub.call_count == 1
-    assert GitHub.call_args == call(token='4cafddbf')
+    assert client.call_count == 1
+    assert client.call_args == call(token='4cafddbf')
