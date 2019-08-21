@@ -17,13 +17,22 @@ def event():
         return load(f)
 
 
-@patch('functions.release.GitHub', autospec=True)
-@patch.dict('os.environ', {'GITHUB_TOKEN': '4cafddbf'})
-def test_handler(client, event):
+def test_handler(event):
     context = None
     response = handler(event, context)
 
     assert response['statusCode'] == 200
 
-    assert client.call_count == 1
-    assert client.call_args == call(token='4cafddbf')
+
+@patch('functions.release.get_file', autospec=True)
+@patch('functions.release.GitHub', autospec=True)
+def test_get_file(client, fn, event):
+    context = None
+    handler(event, context)
+
+    repository_name = 'Codertocat/Hello-World'
+    file_path = 'dependencies.json'
+    expected = call(client.return_value, repository_name, file_path)
+    actual = fn.call_args
+
+    assert expected == actual

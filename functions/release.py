@@ -22,9 +22,13 @@ def handler(event, context):
     client = GitHub(token=os.getenv('GITHUB_TOKEN'))
 
     # For example Codertocat/Hello-World
-    owner, repo = body['release']['repository']['full_name'].split('/')
-    client.repository(owner, repo)
+    repository_name = body['release']['repository']['full_name']
+    get_file(client, repository_name, 'dependencies.json')
 
     return {
         'statusCode': HTTPStatus.OK
     }
+
+
+def get_file(client, repository_name, file_path):
+    pass
