@@ -4,7 +4,7 @@ jobs:
       - image: python:3.7
     steps:
       - checkout
-      - run: pip install pytest
+      - run: pip install pytest pytest-cov
       - run: python -m pytest tests
 version: 2.0
 workflows:
