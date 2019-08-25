@@ -62,6 +62,7 @@ def test_handler(Client, requests, validate, event, context):
             'https://github.com/octocat/Hello-World'
         ]
     })
+
     Client.return_value.get_file.return_value = contents
 
     # The JSON decoded contents returned from the get_file method
@@ -71,6 +72,7 @@ def test_handler(Client, requests, validate, event, context):
 
     assert Client.return_value.get_file.call_args == call(
         'Codertocat/Hello-World', 'deps.json')
+
     assert validate.call_args == call(instance=instance, schema=schema)
 
     # Force the validate function to raise a ValidationError
