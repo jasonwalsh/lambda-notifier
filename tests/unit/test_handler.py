@@ -81,3 +81,10 @@ def test_handler(Client, requests, validate, event, context):
     response = handler(event, context)
 
     assert response['statusCode'] == 400
+
+
+def test_invalid_action(context):
+    event = {'body': dumps({'action': 'unpublished'})}
+    response = handler(event, context)
+
+    assert response['statusCode'] == 204

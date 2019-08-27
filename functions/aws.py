@@ -19,8 +19,14 @@ def create_client(token):
 
 def handler(event, context):
     body = loads(event['body'])
+    if body['action'] != 'published':
+        return {
+            'statusCode': HTTPStatus.NO_CONTENT
+        }
+
     client = create_client(os.getenv('GITHUB_TOKEN'))
     response = requests.get('https://raw.githubusercontent.com/mongodb-ansible-roles/schemas/master/dependencies.json')  # noqa: E501
+
     # The JSON schema used to validate the instance
     schema = response.json()
 
