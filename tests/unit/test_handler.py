@@ -1,49 +1,12 @@
 import os
-import pytest
 
 from json import dumps, load, loads
-from unittest.mock import Mock, call, create_autospec, patch
+from unittest.mock import call, patch
 
-from github3.github import GitHub
 from jsonschema.exceptions import ValidationError
-from functions.client import Client
 from functions.aws import handler
 
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-@pytest.fixture
-def event():
-    """Represents an Amazon API Gateway event"""
-    with open(os.path.join(BASE_DIR, '..', 'event.json')) as f:
-        return load(f)
-
-
-@pytest.fixture
-def context():
-    return None
-
-
-@pytest.fixture
-def session():
-    Session = create_autospec(GitHub, spec_set=True)
-    return Session(token='4494bc85')
-
-
-@patch('functions.client.b64decode')
-def test_get_file(b64decode, session):
-    # The github3.py Repository object
-    repository = session.repository
-    return_value = Mock(content='SGVsbG8gV29ybGQhCg==')
-    repository.return_value.file_contents.return_value = return_value
-
-    client = Client(session)
-    client.get_file('octocat/Hello-World', 'README')
-
-    assert repository.call_args == call('octocat', 'Hello-World')
-    assert repository.return_value.file_contents.call_args == call('README')
-    assert b64decode.call_args == call('SGVsbG8gV29ybGQhCg==')
+from . import BASE_DIR
 
 
 @patch('functions.aws.validate', autospec=True)
