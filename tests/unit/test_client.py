@@ -48,7 +48,6 @@ def test_get_file(b64decode, session):
     client = Client(session)
     client.get_file('octocat/Hello-World', 'README')
 
-    assert session.repository.call_args == call('octocat', 'Hello-World')
     assert session.repository.return_value.file_contents.call_args == call('README')  # noqa
     assert b64decode.call_args == call('SGVsbG8gV29ybGQhCg==')
 
