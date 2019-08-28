@@ -1,5 +1,7 @@
 from base64 import b64decode
 
+from github3.github import GitHub
+
 
 class FileMode:
 
@@ -11,6 +13,11 @@ class Client:
 
     def __init__(self, session):
         self.session = session
+
+    @classmethod
+    def with_token(cls, token):
+        session = GitHub(token=token)
+        return cls(session)
 
     def create_commit(self, repository_name, branch_name, commit_message,
                       put_files=None):

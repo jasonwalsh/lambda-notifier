@@ -4,38 +4,35 @@ import requests
 from http import HTTPStatus
 from json import loads
 
-from github3.github import GitHub
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
 from .client import Client
-
-
-def create_client(token):
-    session = GitHub(token=token)
-    client = Client(session)
-    return client
+from .model import ReleaseEventRequest
 
 
 def handler(event, context):
     body = loads(event['body'])
-    if body['action'] != 'published':
+
+    request = ReleaseEventRequest.from_json(body)
+
+    # If the event action is not 'published', then do nothing
+    if not request.is_publish:
         return {
             'statusCode': HTTPStatus.NO_CONTENT
         }
 
-    client = create_client(os.getenv('GITHUB_TOKEN'))
-    response = requests.get('https://raw.githubusercontent.com/mongodb-ansible-roles/schemas/master/dependencies.json')  # noqa: E501
-
-    # The JSON schema used to validate the instance
-    schema = response.json()
+    client = Client.with_token(os.getenv('GITHUB_TOKEN'))
 
     # For example Codertocat/Hello-World
-    repository_name = body['release']['repository']['full_name']
+    repository_name = request.release.repository.full_name
 
     # The Base64 decoded JSON schema instance
     contents = client.get_file(repository_name, 'deps.json')
+
     instance = loads(contents)
+
+    schema = requests.get(os.getenv('SCHEMA_URL')).json()
 
     try:
         validate(instance=instance, schema=schema)
@@ -43,6 +40,13 @@ def handler(event, context):
         return {
             'statusCode': HTTPStatus.BAD_REQUEST
         }
+
+    for repository in instance['repositories']:
+        repository_name = repository.split('/', 3)[-1]
+        readme = client.get_file(repository_name, 'README')
+        client.put_file(
+            repository_name, 'master', readme, 'README', 'first commit')
+
     return {
         'statusCode': HTTPStatus.OK
     }
