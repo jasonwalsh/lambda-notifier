@@ -4,9 +4,10 @@ jobs:
       - image: python:3.7
     steps:
       - checkout
-      - run: pip install pytest pytest-cov pytest-flake8
+      - run: pip install codecov pytest pytest-cov pytest-flake8
       - run: pip install -r functions/requirements.txt
       - run: python -m pytest
+      - run: codecov
 version: 2.0
 workflows:
   test:
